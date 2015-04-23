@@ -1,11 +1,15 @@
 # azure-config-util
 
-This library will use an Azure Table in order to generate/cache/refresh configuration objects.
+This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOTE* encrypt line item records, you may wish to wrap this module with one that will.
 
 **SIDE-EFFECT:** This module uses `cc-globals` which will load the following global variables `R` (ramda), `fetch` (isomorphic-fetch) and `Promise` (bluebird, overrides native).  Bluebird is better performing and more feature rich than native promises.
 
 *WARNING: Due to sparse documentation, I am uncertain if the underlying Azure Storage client for node will return more than 1000 records at a time (querying on Namespace).  If you need more than that many entries for your namespace/application you should test for this case.*
 
+
+![Data Image](http://i.imgur.com/aN7E8Lg.png)
+
+*Screenshot of [Azure Storage Explorer](http://www.cerebrata.com/products/azure-explorer/introduction) with sample configuration*
 
 ## Installation
 
