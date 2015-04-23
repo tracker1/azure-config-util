@@ -1,6 +1,6 @@
 {
   "name": "azure-storage-util",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Caching configuration utility uses Azure Table for data store",
   "main": "dist/index.js",
   "config": {
