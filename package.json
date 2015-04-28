@@ -1,6 +1,6 @@
 {
   "name": "azure-config-util",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Caching configuration utility uses Azure Table for data store",
   "main": "dist/index.js",
   "config": {
