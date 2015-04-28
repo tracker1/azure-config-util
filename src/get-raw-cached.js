@@ -18,7 +18,7 @@ function getRawCached(options) {
       //remove cached raw data after 4 minutes
       //don't prevent app exit via this timer
       setTimeout(function(){
-        delete rawcache[key];
+        delete rawcache[rawkey];
       }, 240000).unref();
       
       return rawdata;
