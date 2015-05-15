@@ -1,8 +1,7 @@
-var hostname = require('os').hostname();
+import {hostname} from 'os';
+hostname = hostname();
 
-module.exports = getEnvironets;
-
-function getEnvironets(env) {
+export default function(env) {
   //return strongest to weakest preference
   switch (env) {
     case "development":

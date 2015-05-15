@@ -1,11 +1,6 @@
 # azure-config-util
 
-This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item records, you may wish to fork, or wrap this module with one that will.
-
-**SIDE-EFFECT:** This module uses `cc-globals` which will load the following global variables `R` (ramda), `fetch` (isomorphic-fetch) and `Promise` (bluebird, overrides native).  Bluebird is better performing and more feature rich than native promises.
-
-*WARNING: Due to sparse documentation, I am uncertain if the underlying Azure Storage client for node will return more than 1000 records at a time (querying on Namespace).  If you need more than that many entries for your namespace/application you should test for this case.*
-
+This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item records, you may wish to fork, or wrap this module with one that will.  In version 2, the behavior changes, in order to expand this utility.
 
 ![Data Image](http://i.imgur.com/XYoM8CY.png)
 
@@ -48,7 +43,7 @@ var configOptions = {
 }
 
 // You need to run the method the module returns to create a configuration fetcher
-var getConfig = require('azure-config-util')(configOptions);
+var azure = require('azure-config-util')(configOptions);
 
 ...
 
@@ -56,8 +51,8 @@ var getConfig = require('azure-config-util')(configOptions);
 //   this will return a promise resolving to the *current* configuration
 //   the module will refresh itself every 5 minutes
 
-//getConfig will return a promise
-getConfig()
+// getConfig will return a promise
+azureUtil.getConfig()
   .then(function(config){
     // use configuration
     //  section is the "Section" in the Azure Table

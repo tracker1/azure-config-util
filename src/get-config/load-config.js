@@ -1,8 +1,9 @@
-var stringify = require('json-stable-stringify');
-var getRawCached = require('./get-raw-cached');
-var parseRawConfig = require('./parse-raw-config');
-var cache = {};
-var loaders = {};
+import stringify from 'json-stable-stringify';
+import getRawCached from './get-raw-cached';
+import parseRaw from './parse-raw';
+
+let cache = {};
+let loaders = {};
 
 module.exports = loadConfig;
 
