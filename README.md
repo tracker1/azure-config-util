@@ -1,6 +1,6 @@
 # azure-config-util
 
-This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item records, you may wish to fork, or wrap this module with one that will.  In version 2, the behavior changes, in order to expand this utility.
+This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item records, you may wish to fork, or wrap this module with one that will.
 
 ![Data Image](http://i.imgur.com/XYoM8CY.png)
 
@@ -11,7 +11,6 @@ This library will use an Azure Table in order to generate/cache/refresh configur
 ```
 npm install --save azure-config-util
 ```
-
 
 ## Usage
 
@@ -103,8 +102,6 @@ The partition key, and rowkey aren't enforced, an actual query against the `Name
 
 `JsonValue` will be a string which will be parsed via `JSON.parse` and brought into the configuration.
 
-*WARINING: unsure if the node client will return more than the `1000` record limit*
-
 
 ### namespace
 
@@ -129,6 +126,75 @@ Allowed values:
 * `production` or `prod`
   * priority: [`hostname`, `production`, `prod`, `default`]
 
+
+## From 2.0
+
+* This module will no longer leak globals.
+* The main method of this module won't return the getConfig method directly, it's now an object.
+* For [azure-storage-simple](https://www.npmjs.com/package/azure-storage-simple), `require('azure-config-util/azure-storage-simple')` 
+* For [azure-storage](https://www.npmjs.com/package/azure-storage), `require('azure-config-util/azure-storage')`
+
+### azure-storage-simple Wrappers (coming soon)
+
+The following will be exposed as simple methods that will resolve a configuration and return the appropriate item from [azure-storage-simple](https://www.npmjs.com/package/azure-storage-simple).
+
+* getStorage(storageAccountName)
+  * Will return the underlying member for `azure-storage-simple` bound to the configured options
+    * Section: `storage`
+    * Key: storageAccountName
+    * JsonValue: {key:'account-key'} 
+* getQueue(queueKeyName)
+  * Will return the underlying member for `azure-storage-simple` bound to the configured options
+    * Section: `queue`
+    * Key: *queueKeyName*
+    * JsonValue: `{store:'storageAccountName',name:'queueNameToUse'} `
+* getTable(tableKeyName)
+  * Will return the underlying member for `azure-storage-simple` bound to the configured options
+    * Section: `table`
+    * Key: *tableKeyName*
+    * JsonValue: {store:'storageAccountName',name:'tableNameToUse'} 
+* getBlob('name')
+  * Will return the underlying member for `azure-storage-simple` bound to the configured options
+    * Section: `queue`
+    * Key: *tableKeyName*
+    * JsonValue: {store:'storageAccountName',name:'tableNameToUse'} 
+
+### mssql-ng Wrapper (optional dependency)
+
+You must `npm install` [mssql-ng](https://www.npmjs.com/package/mssql-ng) separately.
+
+* getSql(sqlKeyName) returns Promise
+  * Will return a configured [mssql-ng](https://www.npmjs.com/package/mssql-ng) object configured for looked up configuration
+    * Section: `sql`
+    * Key: *sqlKeyName*
+    * JsonValue: configuration for [mssql](https://www.npmjs.com/package/mssql)
+
+### ElasticSearch Wrapper (optional dependency)
+
+You must `npm install` [elasticsearch](https://www.npmjs.com/package/mssql-ng) separately.
+
+* getEsClient(elasticsearchKeyName)
+  * Will return a configured elasticsearch client.
+    * Section: `elasticsearch`
+    * Key: *elasticsearchKeyName*
+    * JsonValue: Options used for an elasticsearch client, including hosts.
+* getEsIndex(esindexKeyName)
+  * Will return a simple wrapper for elasticsearch.
+    * Section: `esindex`
+    * Key: *esindexKeyName*
+    * JsonValue: `{server:elasticsearchKeyName},index:String,type:String}`
+      * server: used with getEsClient( elasticsearchKeyName)
+
+
+### Other Wrappers
+
+I'm considering adding the following wrappers... (optional dependencies)
+
+* Azure Search
+* MySQL
+* PostgreSQL
+* MongoDB
+* RethinkDB
 
 
 ## License
