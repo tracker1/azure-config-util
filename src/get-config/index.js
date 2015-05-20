@@ -8,7 +8,7 @@ let loaders = {}; //loader cache
 export default function(options) {
   options = sanitize(options);
   var key = stringify(key);
-  if (cache[key]) return cache[key];
+  if (cache[key]) return Promise.resolve(cache[key]);
   if (loaders[key]) return loaders[key];
   return (loaders[key] = loadRawConfig(options,key));
 }
@@ -18,7 +18,7 @@ async function loadRawConfig(options,key) {
   var config = await queryAzure(options);
 
   cache[key] = config; //cache the current value
-  setTimeout(()={delete cache[key];},300000).unref(); //remove cached entry after 5 minutes
+  setTimeout(()=>{delete cache[key];},300000).unref(); //remove cached entry after 5 minutes
 
   delete loaders[key]; //remove reference to the loader
 

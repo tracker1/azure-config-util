@@ -46,12 +46,12 @@ var azure = require('azure-config-util')(configOptions);
 
 ...
 
-// always use getConfig,
+// always use config,
 //   this will return a promise resolving to the *current* configuration
 //   the module will refresh itself every 5 minutes
 
-// getConfig will return a promise
-azureUtil.getConfig()
+// config will return a promise, resolving to the configuration to use
+azureUtil.config()
   .then(function(config){
     // use configuration
     //  section is the "Section" in the Azure Table

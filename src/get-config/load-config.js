@@ -32,6 +32,7 @@ function createLoader(key,options) {
       .then(
         (items)=>Promise.resolve(parseRawConfig(options,items)).then((config)=>{
           config._raw = items; //stash raw items on config
+          config._options = options;
           return config;
         })
       )

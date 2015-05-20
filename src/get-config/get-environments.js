@@ -1,24 +1,24 @@
 import {hostname} from 'os';
-hostname = hostname();
+let host = hostname();
 
 export default function(env) {
   //return strongest to weakest preference
   switch (env) {
     case "development":
     case "dev":
-      return [hostname,'development','dev','default'];
+      return [host,'development','dev','default'];
     case "test":
-      return [hostname,'testing','test','default'];
+      return [host,'testing','test','default'];
     case "qa":
-      return [hostname,'qa','default'];
+      return [host,'qa','default'];
     case "stage":
-      return [hostname,'stage','default'];
+      return [host,'stage','default'];
     case "production":
     case "prod":
-      return [hostname,'production','prod','default'];
+      return [host,'production','prod','default'];
     case "local":
     default:
-      return [hostname,'local','development','dev','default'];
+      return [host,'local','development','dev','default'];
   }
 
   return envs;

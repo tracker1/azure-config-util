@@ -1,4 +1,4 @@
-var debug = require('debug')('cc-config');
+var debug = require('debug')('azure-config-util');
 var util = require('util');
 
 module.exports = function() {
