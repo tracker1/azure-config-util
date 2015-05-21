@@ -48,7 +48,7 @@ In order to better utilize azure storage, the following utility methods are writ
 
 ### Azure SQL & Microsoft SQL
 
-You must `npm install` [mssql-ng](https://www.npmjs.com/package/mssql-ng) and [mssql](https://www.npmjs.com/package/mssql) separately.
+You must `npm install` [mssql-ng](https://www.npmjs.com/package/mssql-ng) and [mssql](https://www.npmjs.com/package/mssql) separately from this module.
 
 
 * [.sql(name)](https://github.com/tracker1/azure-config-util/wiki/GetSqlMethod)
