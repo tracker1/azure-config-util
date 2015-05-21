@@ -2,6 +2,11 @@
 
 ***NOW SHOWING VERSION 2.x DOCUMENTATION - UNDER DEVELOPMENT - NOT IN NPM***
 
+This module serves two purposes:
+
+1. Make it easy to use an Azure Storage Table for shard configuration values, with a caching client.
+2. Make it easy to use the shared configuration in order to utilize related services.
+
 This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item configuration records.  Version 3 will add encrypted values, as well as command-line utilities for backing up and restoring config table values.
 
 
