@@ -1,10 +1,9 @@
 # azure-config-util
 
-This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item records, you may wish to fork, or wrap this module with one that will.
+***NOW SHOWING VERSION 2.x DOCUMENTATION - UNDER DEVELOPMENT - NOT IN NPM***
 
-![Data Image](http://i.imgur.com/XYoM8CY.png)
+This library will use an Azure Table in order to generate/cache/refresh configuration objects.  This library does *NOT* encrypt line item configuration records.  Version 3 will add encrypted values, as well as command-line utilities for backing up and restoring config table values.
 
-*Screenshot of [Azure Storage Explorer](http://www.cerebrata.com/products/azure-explorer/introduction) with sample configuration*
 
 ## Installation
 
@@ -14,187 +13,76 @@ npm install --save azure-config-util
 
 ## Usage
 
-The parameters shown here are optional, and the appropriate environment variables you can use are noted.
+Configuration values will be determined and deconstructed from a [configured table](https://github.com/tracker1/azure-config-util/wiki/ConfigurationTable), using [specified configuration options and/or environment variables](https://github.com/tracker1/azure-config-util/wiki/ConfigurationOptions).
+
+The behavior changes from 0.x-1.x in that it will now return a wrapper, and not a resolver/promise method for configuration.
 
 ```js
-// default || CONFIG_ACCOUNT || CONFIG_OPTIONS.account || AZURE_STORAGE_ACCOUNT
-var account = `myazurestorageaccount`;
-
-// default || CONFIG_ACCOUNT_KEY || CONFIG_OPTIONS.accountKey ||  AZURE_STORAGE_ACCESS_KEY
-var accountKey = 'key-for-storage-account';
-
-// default || CONFIG_TABLE || 'config'
-var accountTable = 'tablename';
-
-// default || CONFIG_NS || 'default'
-var namespace = 'my-application';
-
-// default || CONFIG_ENV || NODE_ENV || 'local'
-var environment = 'production';
-
-// JSON.parse(CONFIG_OPTIONS)
-var configOptions = {
-  account: account,
-  accountKey: accountKey,
-  accountTable: accountTable,
-  namespace: namespace, 
-  environment: environment,
-}
-
 // You need to run the method the module returns to create a configuration fetcher
-var azure = require('azure-config-util')(configOptions);
-
-...
-
-// always use config,
-//   this will return a promise resolving to the *current* configuration
-//   the module will refresh itself every 5 minutes
-
-// config will return a promise, resolving to the configuration to use
-azureUtil.config()
-  .then(function(config){
-    // use configuration
-    //  section is the "Section" in the Azure Table
-    //  key is the "Key" in the Azure Table
-    //  value is the JSON.parse'd "JsonValue" in Azure Table
-    var value = config.section.key
-  })
-  .catch(function(err){
-    //error getting configuration, only raised on first attempt
-    //if first load is successful, reload errors will be suppressed behind the scenes
-  });
-
+var azureUtil = require('azure-config-util')(configOptions);
 ```
 
-NOTE: If you would like to set certain defaults globally for the module...
+## Instance Methods
 
-```
-require('azure-config-util/defaults').set(configOptions);
-```
+The current utility methods/wrappers are those that I have needed either for configuration directly, or for use with Azure services.  I welcome other optional dependencies and related wrappers/methods for other libraries.
 
+### Configuration
 
-## Configuration Options
+The configuration object resolution is the basis of this module, all other methods use the configuration to determine connection parameters.
 
-### account
+* [.config()](https://github.com/tracker1/azure-config-util/wiki/GetConfigurationMethod)
+  * Promise resolves to current configuration object (caching)
 
-The name of the Azure Storage Account.
+### Azure Storage
 
-### accountKey
+In order to better utilize azure storage, the following utility methods are written in order to access [azure-storage-simple](https://www.npmjs.com/package/azure-storage-simple) wrappers.
 
-The key for the Azure Storage Account
+* [.storage(name)](https://github.com/tracker1/azure-config-util/wiki/GetStorageMethod)
+  * Promise resolves to named Azure Storage wrapper
+* [.blob(name)](https://github.com/tracker1/azure-config-util/wiki/GetBlobMethod)
+  * Promise resolves to named Azure Storage Container wrapper
+* [.queue(name)](https://github.com/tracker1/azure-config-util/wiki/GetQueueMethod)
+  * Promise resolves to named Azure Storage Queue wrapper
+* [.table(name)](https://github.com/tracker1/azure-config-util/wiki/GetTableMethod/)
+  * Promise resolves to named Azure Storage Table wrapper
 
+### Azure SQL & Microsoft SQL
 
-### accountTable 
-
-The Azure Table to use, which should be configured as follows (there is not yet a UI to interact with this, you can use [Azure Storage Explorer](http://www.cerebrata.com/products/azure-explorer/introduction) to generate your records, and/or import from CSV.
-
-```
-PartitionKey: "namespace_environment"
-RowKey:       "namespace_environment_section_sectionKey"
-Namespace:    "namespace"
-Environment:  "environment"
-Section:      "section"
-Key:          "sectionKey"
-JsonValue:    JSON.stringify(configurationValue) //JSON.parse'd in config
-```
-
-The partition key, and rowkey aren't enforced, an actual query against the `Namespace` field is run to return all available options for that namespace 
-
-`JsonValue` will be a string which will be parsed via `JSON.parse` and brought into the configuration.
+You must `npm install` [mssql-ng](https://www.npmjs.com/package/mssql-ng) and [mssql](https://www.npmjs.com/package/mssql) separately.
 
 
-### namespace
-
-The application/suite namespace to isolate your configuration to.
-
-### environment
-
-If an entry is set to an `Environment` that matches the `hostname`, that value will be used as a priority.  If there is an entry set to an `Environment` of `default` that value will be used as a fallback.
-
-Allowed values:
-
-* `local` (default)
-  * priority: [`hostname`, `local`, `development`, `dev`, `default`]
-* `development` or `dev`
-  * priority: [`hostname`, `development`, `dev`, `default`]
-* `testing` or `test`
-  * priority: [`hostname`, `testing`, `test`, `default`]
-* `qa`
-  * priority: [`hostname`, `qa`, `default`]
-* `staging` or `stage`
-  * priority: [`hostname`, `staging`, `stage`, `default`] 
-* `production` or `prod`
-  * priority: [`hostname`, `production`, `prod`, `default`]
+* [.sql(name)](https://github.com/tracker1/azure-config-util/wiki/GetSqlMethod)
+  * Promise resolves to named [mssql-ng](https://www.npmjs.com/package/mssql-ng) connection.
 
 
-## From 2.0
+### ElasticSearch (Coming Soon)
 
-* This module will no longer leak globals.
-* The main method of this module won't return the getConfig method directly, it's now an object.
-* For [azure-storage-simple](https://www.npmjs.com/package/azure-storage-simple), `require('azure-config-util/azure-storage-simple')` 
-* For [azure-storage](https://www.npmjs.com/package/azure-storage), `require('azure-config-util/azure-storage')`
+You must `npm install` [elasticsearch](https://www.npmjs.com/package/elasticsearch) separately.
 
-### azure-storage-simple Wrappers (coming soon)
-
-The following will be exposed as simple methods that will resolve a configuration and return the appropriate item from [azure-storage-simple](https://www.npmjs.com/package/azure-storage-simple).
-
-* getStorage(storageAccountName)
-  * Will return the underlying member for `azure-storage-simple` bound to the configured options
-    * Section: `storage`
-    * Key: storageAccountName
-    * JsonValue: {key:'account-key'} 
-* getQueue(queueKeyName)
-  * Will return the underlying member for `azure-storage-simple` bound to the configured options
-    * Section: `queue`
-    * Key: *queueKeyName*
-    * JsonValue: `{store:'storageAccountName',name:'queueNameToUse'} `
-* getTable(tableKeyName)
-  * Will return the underlying member for `azure-storage-simple` bound to the configured options
-    * Section: `table`
-    * Key: *tableKeyName*
-    * JsonValue: {store:'storageAccountName',name:'tableNameToUse'} 
-* getBlob('name')
-  * Will return the underlying member for `azure-storage-simple` bound to the configured options
-    * Section: `queue`
-    * Key: *tableKeyName*
-    * JsonValue: {store:'storageAccountName',name:'tableNameToUse'} 
-
-### mssql-ng Wrapper (optional dependency)
-
-You must `npm install` [mssql-ng](https://www.npmjs.com/package/mssql-ng) separately.
-
-* getSql(sqlKeyName) returns Promise
-  * Will return a configured [mssql-ng](https://www.npmjs.com/package/mssql-ng) object configured for looked up configuration
-    * Section: `sql`
-    * Key: *sqlKeyName*
-    * JsonValue: configuration for [mssql](https://www.npmjs.com/package/mssql)
-
-### ElasticSearch Wrapper (optional dependency)
-
-You must `npm install` [elasticsearch](https://www.npmjs.com/package/mssql-ng) separately.
-
-* getEsClient(elasticsearchKeyName)
+* .es.client(keyName)
   * Will return a configured elasticsearch client.
     * Section: `elasticsearch`
     * Key: *elasticsearchKeyName*
     * JsonValue: Options used for an elasticsearch client, including hosts.
-* getEsIndex(esindexKeyName)
+* .es.index(indexKeyName)
   * Will return a simple wrapper for elasticsearch.
     * Section: `esindex`
     * Key: *esindexKeyName*
     * JsonValue: `{server:elasticsearchKeyName},index:String,type:String}`
-      * server: used with getEsClient( elasticsearchKeyName)
+      * server: used with getEsClient(elasticsearchKeyName)
+
+### Other Libraries
+
+Other libraries should ideally implement connection pooling (as needed), and/or use [repromise](https://www.npmjs.com/package/repromise) to implement a retry mechanism.  Not to mention preference to a promises based implementation.
+
+SQL database libraries (mysql, postrgresql, etc), should ideally be wrapped with something similar the the `mssql-ng` wrapper to provide template processing, and promise based results, and transparent connection pooling.
 
 
-### Other Wrappers
+## Configuration Data
 
-I'm considering adding the following wrappers... (optional dependencies)
+For now, it's best to use [Azure Storage Explorer](http://www.cerebrata.com/products/azure-explorer/introduction) (*screenshot below*) to edit your configuration values directly.
 
-* Azure Search
-* MySQL
-* PostgreSQL
-* MongoDB
-* RethinkDB
+![Data Image](http://i.imgur.com/XYoM8CY.png)
 
 
 ## License
